@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Todo Mini</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; }
+    h1 { text-align: center; }
+    ul { list-style: none; padding: 0; }
+    li { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+    li.done span { text-decoration: line-through; color: gray; }
+    input[type="text"] { flex: 1; padding: 6px; }
+    button { padding: 6px 10px; }
+  </style>
+</head>
+<body>
+  <h1>📝 Todo Mini</h1>
+
+  <div>
+    <input type="text" id="newTaskTitle" placeholder="Nhập task mới..." />
+    <button onclick="addTask()">Thêm</button>
+  </div>
+
+  <ul id="taskList"></ul>
+
+  <script>
+    const API_URL = "http://localhost:5085/api/Tasks"; // đúng port của bạn
+
+    async function loadTasks() {
+      const res = await fetch(API_URL);
+      const tasks = await res.json();
+
+      const ul = document.getElementById("taskList");
+      ul.innerHTML = "";
+
+      tasks.forEach(task => {
+        const li = document.createElement("li");
+        if (task.done) li.classList.add("done");
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = task.done;
+        checkbox.onchange = () => toggleDone(task);
+
+        const span = document.createElement("span");
+        span.textContent = task.title;
+
+        li.appendChild(checkbox);
+        li.appendChild(span);
+        ul.appendChild(li);
+      });
+    }
+
+    async function addTask() {
+      const input = document.getElementById("newTaskTitle");
+      const title = input.value.trim();
+      if (!title) return;
+
+      await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: title, done: false })
+      });
+
+      input.value = "";
+      loadTasks();
+    }
+
+    async function toggleDone(task) {
+      await fetch(`${API_URL}/${task.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: task.id,
+          title: task.title,
+          done: !task.done
+        })
+      });
+
+      loadTasks();
+    }
+
+    // Load khi mở trang
+    loadTasks();
+  </script>
+</body>
+</html>
