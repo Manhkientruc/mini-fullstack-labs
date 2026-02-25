@@ -14,7 +14,7 @@
   </style>
 </head>
 <body>
-  <h1>📝 Todo Mini</h1>
+  <h1>Todo Mini</h1>
 
   <div>
     <input type="text" id="newTaskTitle" placeholder="Nhập task mới..." />
@@ -24,7 +24,7 @@
   <ul id="taskList"></ul>
 
   <script>
-    const API_URL = "http://localhost:5085/api/Tasks"; // đúng port của bạn
+    const API_URL = "http://localhost:5085/api/Tasks";
 
     async function loadTasks() {
       const res = await fetch(API_URL);
@@ -80,7 +80,6 @@
       loadTasks();
     }
 
-    // Load khi mở trang
     loadTasks();
   </script>
 </body>
